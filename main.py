@@ -119,9 +119,13 @@ def main():
                         5.上海   """)
 
     print("__________________")
-    loc = input("[*]请选择对应序号:")
-    name, code = Dic.getCode(loc)
-
+    while True:
+        loc = input("[*]请选择对应序号:")
+        name, code = Dic.getCode(loc)
+        if not code:
+            print("[-]City not found.")
+            continue
+        break
     getFutWeather(code,name,3)
 
 main()
