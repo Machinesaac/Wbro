@@ -1,5 +1,19 @@
 import requests
 import asciify
+import Dic
+import time
+import sys
+
+def bar():
+    print("[*]正在查询......")
+    for i in range(11):
+        if i != 10:
+            sys.stdout.write("==")
+        else:
+            sys.stdout.write("== " + str(i * 10) + "%/100%")
+        sys.stdout.flush()
+        time.sleep(0.2)
+    print("\n" + "[+]查询完成")
 
 key = "key=5ce5cb6b817f4661ba8d292679a546f1"
 #loc = "location=101010100"
@@ -82,20 +96,34 @@ def printWeather(Printer):
     print(Printer.printText())
     print(Printer.printWind())
 
-def getFutWeather(location,num):
+def getFutWeather(location,name,num):
     d = str(num)+"d?"
     loc = "location=" + location
     url = "https://devapi.heweather.net/v7/weather/" + d + key + '&' + loc
     print(url)
     board = requests.get(url).json()
     days = [Day(i) for i in board['daily']]
-
+    bar()
+    print("[+]以下是"+ name + "近三天天气: ")
+    print("——————————————————————————————")
     for day in days:
         printWeather(Printer(day))
         print()
 
+def main():
+    print("""[*]现在可查询城市有：
+                        1.北京
+                        2.成都
+                        3.广州
+                        4.韶关
+                        5.上海   """)
 
-getFutWeather("101010100",3)
+    print("__________________")
+    loc = input("[*]请选择对应序号:")
+    name, code = Dic.getCode(loc)
 
+    getFutWeather(code,name,3)
+
+main()
 #r.encoding = 'utf-8'
 #print(r.json()['forecast']['12h']['101280201'])
