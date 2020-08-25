@@ -3,6 +3,7 @@ import asciify
 import Dic
 import time
 import sys
+import draw
 
 def bar():
     print("[*]正在查询......")
@@ -48,8 +49,9 @@ class WeatherNow:
         return text
 
 class Day:
-    def __init__(self,board):
+    def __init__(self,board,pm2):
         self.bo = board
+        self.pm = pm2
 
     def getTime(self):
         time = self.bo['fxDate']
@@ -92,18 +94,21 @@ class Printer:
 
 def printWeather(Printer):
     print(Printer.printDate())
-    print(Printer.printTemp())
     print(Printer.printText())
+    print(Printer.printTemp())
     print(Printer.printWind())
 
 def getFutWeather(location,name,num):
     d = str(num)+"d?"
     loc = "location=" + location
     url = "https://devapi.heweather.net/v7/weather/" + d + key + '&' + loc
+    urlpm = "https://devapi.heweather.net/v7/air/now?" + key + '&' + loc
     print(url)
     board = requests.get(url).json()
-    days = [Day(i) for i in board['daily']]
+    pm = requests.get(urlpm).json()
+    days = [Day(i,pm) for i in board['daily']]
     bar()
+    print("[+}当前PM2.5为:",pm['now']['pm2p5'],"空气质量",pm['now']['category'])
     print("[+]以下是"+ name + "近三天天气: ")
     print("——————————————————————————————")
     for day in days:
@@ -113,15 +118,21 @@ def getFutWeather(location,name,num):
 def main():
     print("""[*]现在可查询城市有：
                         1.北京
-                        2.成都
+                        2.上海
                         3.广州
-                        4.韶关
-                        5.上海   """)
+                        4.成都
+                        5.韶关   """)
 
     print("__________________")
     while True:
-        loc = input("[*]请选择对应序号:")
-        name, code = Dic.getCode(loc)
+        loc = input("[*]请选择你要查询的城市序号:")
+        dic = Dic.Dictionary(loc)
+        city = dic.getCity()
+        for key in city:
+            print(key+'.'+city[key][0])
+        area = input("[*]请选择你要查询的区域序号:")
+        dic.setArea(area)
+        name, code = dic.getArea()
         if not code:
             print("[-]City not found.")
             continue
